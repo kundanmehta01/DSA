@@ -1,1 +1,90 @@
+# Two Pointers (Short Notes)
+
+## 1. What is Two Pointers?
+
+A technique that uses **two indices/pointers** instead of one to solve problems efficiently, usually reducing **O(n²) → O(n)**.
+
+---
+
+## 2. Variations
+
+### 1. Opposite Direction (`L ← → R`)
+
+* Starts from both ends.
+* Used for **sorted arrays**, **palindromes**, **pair sum**.
+
+**Examples:** Two Sum II, Valid Palindrome, Container With Most Water.
+
+---
+
+### 2. Same Direction (Fast & Slow)
+
+* Both move left → right.
+* Fast scans, slow keeps valid elements.
+
+**Examples:** Move Zeroes, Remove Duplicates, Remove Element.
+
+---
+
+### 3. Sliding Window
+
+* Left and right form a window.
+* Expand/shrink window.
+
+**Examples:** Longest Substring, Maximum Sum Subarray.
+
+---
+
+### 4. Two Arrays
+
+* One pointer in each array.
+
+**Examples:** Merge Sorted Arrays, Intersection.
+
+---
+
+### 5. Partitioning
+
+* Divide array into groups.
+
+**Examples:** Sort Colors, QuickSort Partition.
+
+---
+
+### 6. Cycle Detection (Floyd)
+
+* Slow = 1 step, Fast = 2 steps.
+
+**Examples:** Linked List Cycle, Find Duplicate Number.
+
+---
+
+## 3. When to Apply (Checklist)
+
+Ask yourself:
+
+* ✅ Is the array **sorted**?
+* ✅ Need to find a **pair** (sum, difference, closest)?
+* ✅ Need **in-place** modification?
+* ✅ Need a **contiguous** subarray/substring? → Sliding Window   (Monotonic Condiitons)
+* ✅ Need to **merge** two sorted arrays?
+* ✅ Is it a **palindrome** problem?
+* ✅ Need **O(1)** extra space?
+* ✅ Can moving one pointer eliminate impossible answers?
+
+If most answers are **Yes**, think **Two Pointers**.
+
+---
+
+## One-Line Memory Trick
+
+| Clue              | Pattern                     |
+| ----------------- | --------------------------- |
+| Sorted + Pair     | Opposite Pointers           |
+| In-place Update   | Fast & Slow                 |
+| Contiguous Window | Sliding Window              |
+| Merge Two Arrays  | Two Arrays                  |
+| Palindrome        | Opposite / Center Expansion |
+| Cycle             | Floyd's Algorithm           |
+| Triplets          | Fix One + Two Pointers      |
 

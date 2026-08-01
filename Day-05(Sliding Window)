@@ -1,1 +1,76 @@
+1. What is it?
 
+Instead of recalculating every subarray,
+
+expand and shrink a window.
+
+L -------- R
+
+Window changes dynamically.
+
+Variations
+Fixed Window
+
+Window size is fixed.
+
+Example:
+
+Size = K
+
+Questions:
+
+Maximum Average Subarray
+Maximum Sum of Size K
+Variable Window
+
+Expand until invalid.
+
+Shrink until valid.
+
+Examples:
+
+Longest Substring Without Repeating Characters
+Minimum Size Subarray Sum
+When to Apply
+
+Problem contains:
+
+✅ Subarray
+
+✅ Substring
+
+✅ Consecutive elements
+
+✅ Longest
+
+✅ Smallest
+
+✅ At most K
+
+✅ Exactly K
+
+✅ Sum ≤ K
+
+Fixed Window Template
+window = 0
+
+for i in range(k):
+    window += nums[i]
+
+ans = window
+
+for i in range(k, len(nums)):
+    window += nums[i]
+    window -= nums[i-k]
+    ans = max(ans, window)
+Variable Window Template
+left = 0
+
+for right in range(len(nums)):
+
+    # expand
+
+    while invalid:
+        left += 1
+
+    ans = max(ans, right-left+1)

@@ -1,15 +1,3 @@
-283. Move Zeroes (https://leetcode.com/problems/move-zeroes/description/)
-
-class Solution:
-    def moveZeroes(self, nums: List[int]) -> None:
-        n=len(nums)
-        k=0
-
-        for i in range(n):
-            if nums[i]!=0:
-                nums[i],nums[k]=nums[k],nums[i]
-                k+=1
-
 26. Remove Duplicates from Sorted Array (https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/)
 
 class Solution:

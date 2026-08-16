@@ -1,0 +1,778 @@
+# 🔥 Hashing — HashMap & HashSet
+
+Yes. This is the **next DSA topic** after the pointer/sliding-window patterns you studied. Hashing is extremely common in interviews because it often turns an **O(n²) brute-force solution into O(n)**.
+
+---
+
+## 1. What is Hashing?
+
+**Hashing = storing data so we can find it very quickly.**
+
+Instead of repeatedly searching an array:
+
+```python
+arr = [10, 20, 30, 40]
+
+# Is 30 present?
+```
+
+we can put the values into a hash-based structure:
+
+```python
+s = {10, 20, 30, 40}
+
+30 in s   # O(1) average
+```
+
+### Main idea
+
+| Structure | Stores        | Typical lookup |
+| --------- | ------------- | -------------: |
+| `list`    | values        |           O(n) |
+| `set`     | unique values |   **O(1)** avg |
+| `dict`    | key → value   |   **O(1)** avg |
+
+So whenever your problem says:
+
+> "Have I seen this before?"
+> "How many times?"
+> "Where did I see it?"
+> "Can I find the complement?"
+
+👉 **Think Hashing.**
+
+---
+
+# 2. HashMap vs HashSet
+
+In Python:
+
+* **HashMap → `dict`**
+* **HashSet → `set`**
+
+### HashMap / Dictionary
+
+Stores:
+
+```text
+key → value
+```
+
+Example:
+
+```python
+freq = {
+    "a": 3,
+    "b": 2
+}
+```
+
+Meaning:
+
+```text
+a occurs 3 times
+b occurs 2 times
+```
+
+Use it when you need **information associated with something**.
+
+---
+
+### HashSet
+
+Stores only unique values:
+
+```python
+seen = {10, 20, 30}
+```
+
+Use it when you only care:
+
+> "Does this exist?"
+
+Example:
+
+```python
+if 20 in seen:
+    print("Found")
+```
+
+---
+
+# 3. How to Identify Hashing Problems
+
+Look for these clues.
+
+### 🚨 Clue 1 — Frequency
+
+> Count occurrences
+> Most frequent element
+> Character frequency
+> Anagram
+
+Think:
+
+```python
+dict
+```
+
+---
+
+### 🚨 Clue 2 — Previously seen
+
+> Have we seen this number before?
+
+Think:
+
+```python
+set
+```
+
+---
+
+### 🚨 Clue 3 — Fast lookup
+
+> Find whether X exists.
+
+Think:
+
+```python
+set / dict
+```
+
+---
+
+### 🚨 Clue 4 — Complement
+
+Classic:
+
+> Find two numbers whose sum is target.
+
+Instead of checking every pair:
+
+```text
+a + b = target
+```
+
+For current `a`:
+
+```text
+b = target - a
+```
+
+Then ask:
+
+```python
+if target - a in seen:
+```
+
+🔥 This is one of the most important HashMap patterns.
+
+---
+
+### 🚨 Clue 5 — Grouping
+
+> Group words with same characteristics.
+
+Example:
+
+```text
+eat
+tea
+ate
+```
+
+All have the same character frequencies.
+
+Think:
+
+```python
+dict
+```
+
+---
+
+### 🚨 Clue 6 — Prefix Sum
+
+If you see:
+
+> subarray sum
+> number of subarrays with sum K
+> continuous subarray
+
+Immediately consider:
+
+```text
+Prefix Sum + HashMap
+```
+
+We'll cover this carefully.
+
+---
+
+# 4. Five Most Important Hashing Patterns
+
+## Pattern 1 — Frequency Counting
+
+Example:
+
+```text
+nums = [1, 2, 2, 3, 3, 3]
+```
+
+Want:
+
+```text
+1 → 1
+2 → 2
+3 → 3
+```
+
+Python:
+
+```python
+freq = {}
+
+for x in nums:
+    freq[x] = freq.get(x, 0) + 1
+```
+
+Or:
+
+```python
+from collections import Counter
+
+freq = Counter(nums)
+```
+
+### Think:
+
+> **"How many times does X occur?"**
+
+→ HashMap
+
+---
+
+# Pattern 2 — Lookup / Complement
+
+Classic Two Sum.
+
+```text
+nums = [2, 7, 11, 15]
+target = 9
+```
+
+For `2`:
+
+```text
+9 - 2 = 7
+```
+
+Is `7` already seen?
+
+No.
+
+Store `2`.
+
+For `7`:
+
+```text
+9 - 7 = 2
+```
+
+Is `2` seen?
+
+Yes → answer.
+
+```python
+seen = {}
+
+for i, num in enumerate(nums):
+    complement = target - num
+
+    if complement in seen:
+        return [seen[complement], i]
+
+    seen[num] = i
+```
+
+### Key thought:
+
+```text
+Current value
+      ↓
+What do I need?
+      ↓
+Is it already in HashMap?
+```
+
+---
+
+# Pattern 3 — Duplicate Detection
+
+Example:
+
+```text
+[1, 2, 3, 1]
+```
+
+We only care whether something appeared before.
+
+Use a Set:
+
+```python
+seen = set()
+
+for num in nums:
+    if num in seen:
+        return True
+
+    seen.add(num)
+
+return False
+```
+
+### Think:
+
+> "Have I seen this before?"
+
+→ **HashSet**
+
+---
+
+# Pattern 4 — Grouping
+
+Classic example:
+
+```text
+["eat", "tea", "tan", "ate", "nat", "bat"]
+```
+
+We want:
+
+```text
+[
+    ["eat", "tea", "ate"],
+    ["tan", "nat"],
+    ["bat"]
+]
+```
+
+Why are `eat`, `tea`, `ate` together?
+
+Their sorted representation is:
+
+```text
+eat → aet
+tea → aet
+ate → aet
+```
+
+So:
+
+```python
+groups = {}
+
+for word in words:
+    key = ''.join(sorted(word))
+
+    if key not in groups:
+        groups[key] = []
+
+    groups[key].append(word)
+```
+
+General pattern:
+
+```text
+object
+   ↓
+generate a key
+   ↓
+HashMap[key]
+   ↓
+group
+```
+
+---
+
+# Pattern 5 — Prefix Sum + HashMap
+
+🔥 Very important.
+
+Suppose:
+
+```text
+nums = [1, 2, 3]
+```
+
+Prefix sums:
+
+```text
+index     0   1   2
+nums      1   2   3
+prefix    1   3   6
+```
+
+If we want a subarray with sum `K`, we use:
+
+```text
+prefix_current - prefix_previous = K
+```
+
+Therefore:
+
+```text
+prefix_previous = prefix_current - K
+```
+
+So while traversing:
+
+```python
+prefix += num
+
+if prefix - k in seen:
+    ...
+```
+
+The HashMap stores:
+
+```text
+prefix_sum → frequency
+```
+
+This pattern is extremely important for problems involving:
+
+* subarray sum
+* continuous subarray
+* number of subarrays
+* sum equals K
+
+---
+
+# 5. Python Hashing Cheat Sheet
+
+### Set
+
+```python
+s = set()
+
+s.add(x)
+s.remove(x)
+s.discard(x)
+
+if x in s:
+    ...
+```
+
+---
+
+### Dictionary
+
+```python
+d = {}
+
+d[key] = value
+
+if key in d:
+    ...
+
+value = d.get(key, 0)
+```
+
+---
+
+### Frequency
+
+```python
+freq[x] = freq.get(x, 0) + 1
+```
+
+---
+
+### Counter
+
+```python
+from collections import Counter
+
+freq = Counter(nums)
+```
+
+---
+
+### Defaultdict
+
+Useful for grouping:
+
+```python
+from collections import defaultdict
+
+groups = defaultdict(list)
+
+groups[key].append(value)
+```
+
+---
+
+# 6. Complexity
+
+Average-case:
+
+| Operation | HashSet | HashMap |
+| --------- | ------: | ------: |
+| Insert    |    O(1) |    O(1) |
+| Search    |    O(1) |    O(1) |
+| Delete    |    O(1) |    O(1) |
+
+For `n` elements:
+
+```text
+n insertions → O(n)
+```
+
+Space:
+
+```text
+O(n)
+```
+
+### Important interview wording
+
+Say:
+
+> **O(1) average-case lookup**, not guaranteed O(1).
+
+Hash tables can have collisions, so worst-case behavior can degrade.
+
+---
+
+# 7. Common Mistakes
+
+### ❌ Mistake 1: Using a Set when you need indexes
+
+If you need:
+
+```text
+value → index
+```
+
+use:
+
+```python
+dict
+```
+
+not:
+
+```python
+set
+```
+
+---
+
+### ❌ Mistake 2: Checking after inserting
+
+For Two Sum:
+
+```python
+seen[num] = i
+
+if target - num in seen:
+```
+
+This can accidentally use the **same element twice**.
+
+Better:
+
+```python
+if target - num in seen:
+    ...
+
+seen[num] = i
+```
+
+---
+
+### ❌ Mistake 3: Forgetting `.get()`
+
+Instead of:
+
+```python
+freq[x] += 1
+```
+
+when `x` may not exist:
+
+```python
+freq[x] = freq.get(x, 0) + 1
+```
+
+---
+
+### ❌ Mistake 4: Sorting unnecessarily
+
+If you only need:
+
+> "Does duplicate exist?"
+
+Don't do:
+
+```python
+nums.sort()
+```
+
+and scan.
+
+Use:
+
+```python
+set(nums)
+```
+
+when appropriate.
+
+Sorting:
+
+```text
+O(n log n)
+```
+
+Hashing:
+
+```text
+O(n) average
+```
+
+---
+
+# 8. 🔥 8 LeetCode Problems
+
+Do these in roughly this order:
+
+| # | Problem                                            | Pattern                  |
+| - | -------------------------------------------------- | ------------------------ |
+| 1 | **Two Sum**                                        | Complement               |
+| 2 | **Contains Duplicate**                             | HashSet                  |
+| 3 | **Valid Anagram**                                  | Frequency                |
+| 4 | **Group Anagrams**                                 | Grouping                 |
+| 5 | **Top K Frequent Elements**                        | Frequency                |
+| 6 | **Longest Consecutive Sequence**                   | HashSet                  |
+| 7 | **Subarray Sum Equals K**                          | Prefix Sum + HashMap     |
+| 8 | **Longest Substring Without Repeating Characters** | HashSet + Sliding Window |
+
+For LeetCode, you can search the exact problem titles directly on [LeetCode](https://leetcode.com/?utm_source=chatgpt.com).
+
+### Difficulty progression
+
+```text
+Easy
+ ↓
+Two Sum
+Contains Duplicate
+Valid Anagram
+ ↓
+Medium
+ ↓
+Group Anagrams
+Top K Frequent Elements
+Longest Consecutive Sequence
+Subarray Sum Equals K
+Longest Substring Without Repeating Characters
+```
+
+---
+
+# 🧠 The Hashing Decision Tree
+
+When you see a new problem, ask:
+
+```text
+                Hashing?
+                   │
+          ┌────────┴────────┐
+          │                 │
+   Need only existence?   Need information?
+          │                 │
+        SET               DICT
+          │                 │
+    "seen before?"    frequency/index/value
+                            │
+                    ┌───────┴────────┐
+                    │                │
+                Frequency        Complement
+                    │                │
+                 dict          Two Sum style
+```
+
+Then:
+
+```text
+Subarray + sum?
+        ↓
+Prefix Sum + HashMap
+```
+
+And:
+
+```text
+Group similar objects?
+        ↓
+Generate key + HashMap
+```
+
+---
+
+# 🎯 Your Interview Checklist
+
+Before coding, ask:
+
+1. **Do I need fast lookup?**
+2. **Do I need to know whether I've seen something?**
+3. **Do I need frequency?**
+4. **Do I need value → index mapping?**
+5. **Can I calculate a complement?**
+6. **Am I grouping things by some property?**
+7. **Is this a subarray-sum problem? → Prefix Sum + HashMap**
+8. **Can Hashing reduce O(n²) → O(n)?**
+
+If you can recognize these, you're already covering a **huge chunk of interview HashMap/HashSet questions**.
+
+---
+
+## 🧪 Now let's test you — but don't code yet
+
+Answer these **5 concept questions** in your own words:
+
+**Q1.** What is the main difference between a HashMap and HashSet?
+
+**Q2.** You have:
+
+```python
+nums = [4, 2, 7, 2, 9]
+```
+
+You only want to detect whether a duplicate exists. Which structure would you use and why?
+
+**Q3.** In Two Sum, why do we calculate:
+
+```python
+target - current
+```
+
+?
+
+**Q4.** If you need:
+
+```text
+number → its index
+```
+
+would you use a `set` or `dict`?
+
+**Q5.** If the problem says:
+
+> "Find the number of subarrays whose sum equals K"
+
+Which pattern should immediately come to mind?
+
+**Answer Q1–Q5.** Then I'll check your answers and move you to **Hashing coding patterns**, starting with **Two Sum → Frequency → Grouping → Prefix Sum**, and finally give you a proper interview-style test.

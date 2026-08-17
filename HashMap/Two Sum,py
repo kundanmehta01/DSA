@@ -11,3 +11,25 @@ class Solution:
 
             freq[num]=i
 
+class Solution:
+    def isAnagram(self, s: str, t: str) -> bool:
+        freq1={}
+        freq2={}
+
+        for i in s:
+            if s[i] in freq1:
+                freq[i]=freq[i]+1
+
+            freq[i]=1
+
+            for j in t:
+              if s[j] in freq1:
+                  freq[j]=freq[j]+1
+
+                freq[j]=1
+
+            if freq1 == freq 2:
+                return True
+            else:
+                return False
+        

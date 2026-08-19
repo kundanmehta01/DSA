@@ -12,6 +12,4 @@ class Solution:
 
         return sorted_freq[:k]
 
-
-
         

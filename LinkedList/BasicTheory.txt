@@ -1,0 +1,412 @@
+1. What is a Linked List?
+A normal Python list stores elements in sequence:
+arr = [10, 20, 30]
+Conceptually:
+Index:   0    1    2
+Value:  10 → 20 → 30
+A linked list stores data inside nodes.
+Each node contains:
+1. data/value
+2. reference (pointer) to the next node
+┌───────┬───────┐
+│  10   │   •───┼──→
+└───────┴───────┘
+
+┌───────┬───────┐
+│  20   │   •───┼──→
+└───────┴───────┘
+
+┌───────┬───────┐
+│  30   │ None  │
+└───────┴───────┘
+So:
+head
+ ↓
+10 → 20 → 30 → None
+head is the first node.
+2. Creating a Node in Python
+In interview/LeetCode questions, you will commonly see this:
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+Let's understand it.
+node = ListNode(10)
+This creates:
+node
+ ↓
+[10 | None]
+Now create another node:
+node2 = ListNode(20)
+[10 | None]
+
+[20 | None]
+Connect them:
+node.next = node2
+Now:
+10 → 20 → None
+3. Creating a Complete Linked List
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+
+first = ListNode(10)
+second = ListNode(20)
+third = ListNode(30)
+
+first.next = second
+second.next = third
+
+head = first
+Result:
+head
+ ↓
+10 → 20 → 30 → None
+4. Traversing a Linked List
+This is the most important basic concept.
+Suppose:
+head → 10 → 20 → 30 → None
+To visit every node:
+current = head
+
+while current:
+    print(current.val)
+    current = current.next
+Output:
+10
+20
+30
+How it works
+Initially:
+current
+   ↓
+10 → 20 → 30 → None
+After:
+current = current.next
+10 → 20 → 30 → None
+      ↑
+   current
+Then:
+10 → 20 → 30 → None
+           ↑
+        current
+Finally:
+current = None
+Loop stops.
+Remember this pattern
+current = head
+
+while current:
+    # do something
+    current = current.next
+You will use this in almost every Linked List problem.
+5. Convert Linked List to Python List
+Useful for understanding and debugging:
+def print_list(head):
+    current = head
+
+    while current:
+        print(current.val, end=" -> ")
+        current = current.next
+
+    print("None")
+Usage:
+print_list(head)
+Output:
+10 -> 20 -> 30 -> None
+6. Insert at the Beginning
+Original:
+head → 10 → 20 → 30 → None
+We want to insert 5.
+Step 1
+Create node:
+new_node = ListNode(5)
+Step 2
+Point it toward the old head:
+new_node.next = head
+Step 3
+Update head:
+head = new_node
+Result:
+head
+ ↓
+5 → 10 → 20 → 30 → None
+Code:
+def insert_at_beginning(head, value):
+    new_node = ListNode(value)
+    new_node.next = head
+    return new_node
+Usage:
+head = insert_at_beginning(head, 5)
+7. Insert at the End
+Original:
+10 → 20 → 30 → None
+Add 40:
+def insert_at_end(head, value):
+    new_node = ListNode(value)
+
+    # If list is empty
+    if head is None:
+        return new_node
+
+    current = head
+
+    while current.next:
+        current = current.next
+
+    current.next = new_node
+
+    return head
+Result:
+10 → 20 → 30 → 40 → None
+Important difference
+For traversal:
+while current:
+For finding the last node:
+while current.next:
+Because we stop at:
+30 → None
+ ↑
+current
+8. Search for a Value
+Find whether 20 exists.
+def search(head, target):
+    current = head
+
+    while current:
+        if current.val == target:
+            return True
+
+        current = current.next
+
+    return False
+Example:
+print(search(head, 20))
+Output:
+True
+9. Count Nodes
+def count_nodes(head):
+    count = 0
+    current = head
+
+    while current:
+        count += 1
+        current = current.next
+
+    return count
+For:
+10 → 20 → 30
+Output:
+3
+10. Delete the First Node
+Original:
+head
+ ↓
+10 → 20 → 30 → None
+Simply move head:
+def delete_first(head):
+    if head is None:
+        return None
+
+    return head.next
+Result:
+head
+ ↓
+20 → 30 → None
+11. Delete the Last Node
+def delete_last(head):
+
+    if head is None:
+        return None
+
+    # Only one node
+    if head.next is None:
+        return None
+
+    current = head
+
+    # Stop at second-last node
+    while current.next.next:
+        current = current.next
+
+    current.next = None
+
+    return head
+Example:
+10 → 20 → 30 → None
+We stop at 20:
+10 → 20 → 30
+     ↑
+ current
+Then:
+current.next = None
+Result:
+10 → 20 → None
+12. Delete a Specific Value
+Delete 20:
+10 → 20 → 30 → None
+Code:
+def delete_value(head, target):
+
+    if head is None:
+        return None
+
+    # Target is first node
+    if head.val == target:
+        return head.next
+
+    current = head
+
+    while current.next:
+        if current.next.val == target:
+            current.next = current.next.next
+            return head
+
+        current = current.next
+
+    return head
+Most important line
+current.next = current.next.next
+Before:
+10 → 20 → 30
+↑
+current
+After:
+10 ─────→ 30
+The 20 node is skipped.
+13. Reverse a Linked List 🔥
+This is one of the most important Linked List problems.
+Original:
+1 → 2 → 3 → None
+Wanted:
+3 → 2 → 1 → None
+Use three pointers:
+prev = None
+current = head
+Code:
+def reverse_list(head):
+
+    prev = None
+    current = head
+
+    while current:
+        next_node = current.next
+        current.next = prev
+        prev = current
+        current = next_node
+
+    return prev
+Dry run
+Start:
+prev = None
+
+current
+ ↓
+1 → 2 → 3 → None
+First iteration
+next_node = current.next
+Save 2.
+current.next = prev
+Now:
+1 → None
+Then:
+prev = current
+prev
+ ↓
+1 → None
+Then:
+current = next_node
+prev          current
+ ↓               ↓
+1 → None       2 → 3 → None
+Continue until:
+3 → 2 → 1 → None
+Return:
+return prev
+The 3 Most Important Variables 🔥
+For most linked list questions, you will work with:
+prev
+current
+next_node
+Template:
+prev = None
+current = head
+
+while current:
+
+    next_node = current.next
+
+    # manipulate pointers here
+
+    prev = current
+    current = next_node
+Time Complexity
+Operation	Linked List
+Access by index	O(n)
+Search	O(n)
+Insert at beginning	O(1)
+Delete at beginning	O(1)
+Insert at end	O(n)
+Reverse	O(n)
+
+
+Compared with Python list
+arr[5]
+Python list can access directly.
+But in a linked list:
+head → node → node → node → node
+To reach index 5, you must travel through nodes.
+The Important Linked List Patterns You Should Learn Next
+After these basics, I recommend learning in this order:
+Pattern 1: Traversal
+Examples:
+- Count nodes
+- Search element
+- Find maximum
+Pattern 2: Dummy Node 🔥
+Used for:
+- Merge two lists
+- Remove nodes
+- Partition lists
+Pattern 3: Slow and Fast Pointers 🔥🔥
+Used for:
+- Find middle
+- Detect cycle
+- Find cycle start
+Example:
+slow = head
+fast = head
+
+while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+Pattern 4: Reversal 🔥🔥🔥
+Used for:
+- Reverse linked list
+- Reverse part of list
+- Palindrome linked list
+- Reverse nodes in k-group
+Pattern 5: Two Pointers
+Used for:
+- Remove nth node from end
+- Intersection of two lists
+Pattern 6: Merge Lists
+Used for:
+- Merge two sorted lists
+- Merge K sorted lists
+Your core template to memorize
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+
+def traverse(head):
+    current = head
+
+    while current:
+        print(current.val)
+        current = current.next
+Don't try to memorize all Linked List questions yet. First become comfortable with drawing the nodes and understanding head, current, and current.next.

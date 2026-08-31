@@ -1,0 +1,1 @@
+self.next = None

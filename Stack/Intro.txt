@@ -1,0 +1,614 @@
+# 📚 Stack — DSA Pattern
+
+Stack is an important DSA topic, and it connects directly to several **LeetCode patterns** like parentheses, monotonic stacks, and expression evaluation.
+
+---
+
+## 1. What is a Stack?
+
+A **Stack** is a linear data structure that follows:
+
+> **LIFO — Last In, First Out**
+
+Think of a stack of plates:
+
+```text
+        ┌─────┐
+        │  30 │ ← TOP
+        ├─────┤
+        │  20 │
+        ├─────┤
+        │  10 │
+        └─────┘
+```
+
+If you add `40`:
+
+```text
+        ┌─────┐
+        │  40 │ ← TOP
+        ├─────┤
+        │  30 │
+        ├─────┤
+        │  20 │
+        ├─────┤
+        │  10 │
+        └─────┘
+```
+
+You remove **40 first**.
+
+### Main operations
+
+| Operation | Meaning | Time |
+|---|---|---|
+| `push(x)` | Add to top | O(1) |
+| `pop()` | Remove top | O(1) |
+| `peek()` / `top()` | See top | O(1) |
+| `isEmpty()` | Check empty | O(1) |
+
+---
+
+# 2. Stack in Python
+
+Python usually uses a **list** as a stack:
+
+```python
+stack = []
+
+stack.append(10)   # push
+stack.append(20)
+stack.append(30)
+
+print(stack)
+# [10, 20, 30]
+
+print(stack.pop())
+# 30
+
+print(stack[-1])
+# 20
+```
+
+So remember:
+
+```text
+push  → append()
+pop   → pop()
+peek  → stack[-1]
+```
+
+---
+
+# 3. The Most Important Part: How to Identify Stack Problems
+
+When solving a problem, ask:
+
+### 🚨 Checklist
+
+**1. Do I need to process the most recent/previous element first?**
+
+→ Think **Stack**
+
+**2. Do elements need to "wait" until something happens to them?**
+
+→ Think **Stack**
+
+**3. Are there matching pairs?**
+
+```text
+( )
+[ ]
+{ }
+```
+
+→ Think **Stack**
+
+**4. Is the problem asking for:**
+
+- next greater element
+- next smaller element
+- previous greater element
+- previous smaller element
+
+→ Think **Monotonic Stack**
+
+**5. Are we undoing/reversing operations?**
+
+→ Stack may be useful.
+
+---
+
+# 4. Pattern #1 — Matching Parentheses
+
+This is the **classic Stack problem**.
+
+Example:
+
+```text
+Input: "({[]})"
+```
+
+Process:
+
+```text
+( → push
+{ → push
+[ → push
+
+] → matches [
+} → matches {
+) → matches (
+```
+
+Stack becomes empty → valid.
+
+### Algorithm
+
+```python
+stack = []
+
+for ch in s:
+
+    if ch in "([{":
+        stack.append(ch)
+
+    else:
+        if not stack:
+            return False
+
+        if ch == ')' and stack[-1] != '(':
+            return False
+
+        if ch == ']' and stack[-1] != '[':
+            return False
+
+        if ch == '}' and stack[-1] != '{':
+            return False
+
+        stack.pop()
+
+return len(stack) == 0
+```
+
+### The key thought
+
+Whenever you see:
+
+> "Does this closing thing match the most recently opened thing?"
+
+🔥 **Stack**
+
+---
+
+# 5. Pattern #2 — Monotonic Stack ⭐
+
+This is the **most important Stack pattern for interviews**.
+
+Suppose:
+
+```text
+[2, 1, 5, 3, 4]
+```
+
+Find the **next greater element** for every number.
+
+For `2` → `5`
+
+For `1` → `5`
+
+For `5` → none
+
+For `3` → `4`
+
+For `4` → none
+
+Answer:
+
+```text
+[5, 5, -1, 4, -1]
+```
+
+Instead of repeatedly searching to the right, we maintain a stack.
+
+### Why?
+
+Because some elements are **waiting for a greater element**.
+
+Think:
+
+```text
+2 is waiting...
+1 is waiting...
+5 arrives
+```
+
+`5` is greater than both:
+
+```text
+5 > 1
+5 > 2
+```
+
+So we resolve them.
+
+This is the core idea behind **monotonic stack**.
+
+---
+
+# 6. How to Think About Monotonic Stack
+
+When you see:
+
+> **Next Greater**
+
+Think:
+
+```text
+Monotonic decreasing stack
+```
+
+When you see:
+
+> **Next Smaller**
+
+Think:
+
+```text
+Monotonic increasing stack
+```
+
+Basic template:
+
+```python
+stack = []
+
+for i in range(len(nums)):
+
+    while stack and nums[i] > nums[stack[-1]]:
+        j = stack.pop()
+
+        # nums[i] is the next greater element of nums[j]
+
+    stack.append(i)
+```
+
+Notice something important:
+
+### We store indices, not necessarily values.
+
+Why?
+
+Because often the problem asks:
+
+- where is the next greater?
+- distance to next greater
+- index difference
+- temperatures difference
+
+So indices give us more information.
+
+---
+
+# 7. Pattern #3 — Previous Greater / Smaller
+
+Stack isn't only about **next**.
+
+You can get:
+
+```text
+Next Greater
+Next Smaller
+
+Previous Greater
+Previous Smaller
+```
+
+A useful mental table:
+
+| Question | Pattern |
+|---|---|
+| Next Greater | Monotonic Stack |
+| Next Smaller | Monotonic Stack |
+| Previous Greater | Monotonic Stack |
+| Previous Smaller | Monotonic Stack |
+
+This is one of the biggest Stack patterns to recognize.
+
+---
+
+# 8. Pattern #4 — Stack for "Undo"
+
+Imagine:
+
+```text
+A → B → C → D
+```
+
+If you want to undo the latest operation:
+
+```text
+D
+C
+B
+A
+```
+
+That's naturally LIFO.
+
+Examples:
+
+- browser history
+- undo/redo
+- function calls
+- backtracking
+- removing recently added items
+
+---
+
+# 9. Pattern #5 — Expression Problems
+
+Stack is also heavily used for:
+
+```text
+2 + 3 * 4
+```
+
+or:
+
+```text
+(2 + 3) * 4
+```
+
+and postfix expressions:
+
+```text
+2 3 + 4 *
+```
+
+You may encounter:
+
+- Evaluate Reverse Polish Notation
+- Basic Calculator
+- Decode String
+
+These often require one or more stacks.
+
+---
+
+# 10. Pattern #6 — Remove Elements Using Stack
+
+A surprisingly common pattern:
+
+> "Remove previous elements when the current element makes them invalid."
+
+Example:
+
+```text
+"abbaca"
+```
+
+Remove adjacent equal characters:
+
+```text
+a
+ab
+abb → remove bb
+a
+ac
+```
+
+Result:
+
+```text
+"ca"
+```
+
+Stack makes this very simple:
+
+```python
+stack = []
+
+for ch in s:
+    if stack and stack[-1] == ch:
+        stack.pop()
+    else:
+        stack.append(ch)
+
+return ''.join(stack)
+```
+
+### Mental trigger
+
+If you see:
+
+> "Remove the previous element if current element satisfies X"
+
+🔥 Think Stack.
+
+---
+
+# 11. Why Stack Solutions Are Often O(n)
+
+This is extremely important for interviews.
+
+Suppose:
+
+```python
+while stack and nums[i] > nums[stack[-1]]:
+    stack.pop()
+```
+
+You might think:
+
+> "There's a `while` inside a `for`, so isn't this O(n²)?"
+
+Usually **NO**.
+
+Why?
+
+Every element gets:
+
+```text
+push → once
+pop  → at most once
+```
+
+So across the entire algorithm:
+
+```text
+n pushes
++
+n pops
+=
+2n
+```
+
+Therefore:
+
+```text
+O(n)
+```
+
+This is called **amortized O(n)**.
+
+---
+
+# 12. Stack vs Queue
+
+Very important distinction:
+
+### Stack
+
+```text
+LIFO
+
+10 → 20 → 30
+
+pop → 30
+```
+
+### Queue
+
+```text
+FIFO
+
+10 → 20 → 30
+
+remove → 10
+```
+
+Think:
+
+```text
+Stack = plates
+Queue = line of people
+```
+
+---
+
+# 13. Stack Interview Identification Cheat Sheet 🧠
+
+When reading a problem, look for these words:
+
+```text
+matching parentheses
+balanced brackets
+next greater
+next smaller
+previous greater
+previous smaller
+nearest greater
+nearest smaller
+undo
+recent
+remove previous
+evaluate expression
+nested
+decode
+histogram
+```
+
+Especially:
+
+> **NEXT / PREVIOUS + GREATER / SMALLER**
+
+🚨 **MONOTONIC STACK ALERT**
+
+---
+
+# 14. LeetCode Practice Order
+
+I recommend doing these **in this order**:
+
+### 🟢 Beginner
+
+1. **Valid Parentheses** — Stack basics  
+   https://leetcode.com/problems/valid-parentheses/
+
+2. **Remove All Adjacent Duplicates In String** — Stack simulation  
+   https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/
+
+3. **Backspace String Compare** — Stack thinking  
+   https://leetcode.com/problems/backspace-string-compare/
+
+### 🟡 Intermediate
+
+4. **Evaluate Reverse Polish Notation** — Expression + Stack  
+   https://leetcode.com/problems/evaluate-reverse-polish-notation/
+
+5. **Min Stack** — Designing a stack  
+   https://leetcode.com/problems/min-stack/
+
+6. **Daily Temperatures** — ⭐ Monotonic Stack  
+   https://leetcode.com/problems/daily-temperatures/
+
+7. **Next Greater Element II** — ⭐ Monotonic Stack + Circular Array  
+   https://leetcode.com/problems/next-greater-element-ii/
+
+### 🔴 Advanced
+
+8. **Largest Rectangle in Histogram** — ⭐⭐⭐ Classic Monotonic Stack  
+   https://leetcode.com/problems/largest-rectangle-in-histogram/
+
+---
+
+## 🧠 The Stack Mental Model
+
+Don't memorize random Stack questions.
+
+Build this thought process:
+
+```text
+Problem
+   ↓
+Do I care about the MOST RECENT element?
+   ↓
+YES
+   ↓
+STACK
+   ↓
+Is it matching/nesting?
+   → Normal Stack
+
+Is it next/previous greater/smaller?
+   → Monotonic Stack
+
+Is it removing previous elements?
+   → Stack
+
+Is it expression evaluation?
+   → Stack
+```
+
+### The #1 thing I want you to learn
+
+When you see:
+
+> **"For each element, find the first/nearest element to its left/right that is greater/smaller."**
+
+Immediately think:
+
+# 👉 Monotonic Stack
+
+That pattern is much more important for DSA interviews than simply knowing `push()` and `pop()`.

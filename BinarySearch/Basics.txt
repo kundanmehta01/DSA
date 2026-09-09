@@ -1,0 +1,955 @@
+Absolutely. Since you're learning DSA **pattern-by-pattern**, let's learn Binary Search in the same way: **intuition → template → variations → identification → LeetCode practice**.
+
+# 🔎 Binary Search
+
+Binary Search is an algorithm used to **search efficiently in a sorted search space**.
+
+Instead of checking every element:
+
+```text
+1 2 3 4 5 6 7 8 9
+        ↑
+```
+
+we repeatedly cut the search space in half.
+
+### Complexity
+
+| Approach | Time |
+|---|---:|
+| Linear Search | O(n) |
+| Binary Search | **O(log n)** |
+
+For example, with 1,000,000 elements:
+
+- Linear search → potentially 1,000,000 checks
+- Binary search → about **20 checks**
+
+Because:
+
+```text
+1,000,000
+→ 500,000
+→ 250,000
+→ 125,000
+→ ...
+→ 1
+```
+
+---
+
+# 1. The Core Idea
+
+Suppose:
+
+```text
+nums = [1, 3, 5, 7, 9, 11, 13]
+target = 9
+```
+
+We maintain:
+
+```text
+left
+right
+```
+
+Initially:
+
+```text
+left = 0
+right = 6
+```
+
+Calculate middle:
+
+```python
+mid = (left + right) // 2
+```
+
+So:
+
+```text
+left       mid       right
+ ↓          ↓          ↓
+[1, 3, 5, 7, 9, 11, 13]
+           7
+```
+
+Actually `mid = 3`, so `nums[mid] = 7`.
+
+Target is `9`.
+
+Since:
+
+```text
+9 > 7
+```
+
+and the array is sorted, we **know everything left of 7 is useless**.
+
+So:
+
+```python
+left = mid + 1
+```
+
+Now:
+
+```text
+[9, 11, 13]
+ ↑
+left
+```
+
+Repeat.
+
+---
+
+# 2. The Basic Binary Search Template
+
+This is the first template you should memorize:
+
+```python
+def binary_search(nums, target):
+    left = 0
+    right = len(nums) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            return mid
+
+        elif nums[mid] < target:
+            left = mid + 1
+
+        else:
+            right = mid - 1
+
+    return -1
+```
+
+### Understand these three cases
+
+```python
+if nums[mid] == target:
+    return mid
+```
+
+Found it.
+
+---
+
+```python
+elif nums[mid] < target:
+    left = mid + 1
+```
+
+Middle is too small.
+
+Because the array is sorted:
+
+```text
+everything before mid is also too small
+```
+
+So throw it away.
+
+---
+
+```python
+else:
+    right = mid - 1
+```
+
+Middle is too large.
+
+Therefore:
+
+```text
+everything after mid is also too large
+```
+
+Throw it away.
+
+---
+
+# 3. Why `left <= right`?
+
+This is important.
+
+Suppose:
+
+```text
+left = 3
+right = 3
+```
+
+There is still **one element** to check.
+
+```text
+[1, 3, 5, 7]
+       ↑
+    left/right
+```
+
+Therefore:
+
+```python
+while left <= right:
+```
+
+not:
+
+```python
+while left < right:
+```
+
+The `<=` allows us to check the final remaining element.
+
+---
+
+# 4. Dry Run
+
+Let's search:
+
+```text
+nums = [2, 4, 6, 8, 10, 12, 14]
+target = 12
+```
+
+### Step 1
+
+```text
+left = 0
+right = 6
+
+mid = 3
+nums[mid] = 8
+```
+
+Target:
+
+```text
+12 > 8
+```
+
+Therefore:
+
+```python
+left = mid + 1
+```
+
+Now:
+
+```text
+left = 4
+right = 6
+```
+
+---
+
+### Step 2
+
+```text
+mid = (4 + 6) // 2
+    = 5
+```
+
+```text
+nums[5] = 12
+```
+
+Found.
+
+```python
+return 5
+```
+
+Only **2 checks**.
+
+---
+
+# 5. The MOST Important Thing: Binary Search Is a Pattern
+
+Don't think:
+
+> "Binary Search = searching an array."
+
+That's too narrow.
+
+Think:
+
+> **Binary Search = repeatedly eliminating half of a search space using some monotonic property.**
+
+This is why binary search appears in many problems where there isn't even a traditional "search for this number."
+
+---
+
+# 6. When Should I Think of Binary Search?
+
+Use this checklist.
+
+### ✅ Signal 1: Array is sorted
+
+Example:
+
+```text
+[1, 3, 5, 7, 9, 11]
+```
+
+Immediately think:
+
+> Binary Search?
+
+---
+
+### ✅ Signal 2: "Find target"
+
+For example:
+
+> Find the index of `target` in a sorted array.
+
+Classic binary search.
+
+---
+
+### ✅ Signal 3: Find first/last occurrence
+
+Example:
+
+```text
+[1, 2, 2, 2, 3, 4]
+       ↑
+```
+
+Question:
+
+> Find the first occurrence of 2.
+
+Binary search variation.
+
+---
+
+### ✅ Signal 4: Find minimum/maximum satisfying a condition
+
+This is extremely important.
+
+For example:
+
+> What is the minimum speed required to finish all bananas within `h` hours?
+
+You might binary search the **answer**, not the array.
+
+---
+
+### ✅ Signal 5: Search space can be divided into two halves
+
+Ask:
+
+> "Can I determine which half cannot possibly contain the answer?"
+
+If yes → binary search may work.
+
+---
+
+# 7. Variation #1 — First Occurrence
+
+Consider:
+
+```text
+nums = [1, 2, 2, 2, 3, 4]
+target = 2
+```
+
+Normal binary search could return:
+
+```text
+index 1
+index 2
+index 3
+```
+
+But what if we specifically need:
+
+> **first position of 2**
+
+When we find `2`, don't stop.
+
+Instead:
+
+```python
+answer = mid
+right = mid - 1
+```
+
+Because maybe there is another `2` on the left.
+
+Template:
+
+```python
+def first_occurrence(nums, target):
+    left = 0
+    right = len(nums) - 1
+    answer = -1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            answer = mid
+            right = mid - 1
+
+        elif nums[mid] < target:
+            left = mid + 1
+
+        else:
+            right = mid - 1
+
+    return answer
+```
+
+### Key idea
+
+Normal:
+
+```text
+found → STOP
+```
+
+First occurrence:
+
+```text
+found → save → search LEFT
+```
+
+---
+
+# 8. Variation #2 — Last Occurrence
+
+Same array:
+
+```text
+[1, 2, 2, 2, 3, 4]
+```
+
+Want the **last `2`**.
+
+When found:
+
+```python
+answer = mid
+left = mid + 1
+```
+
+Because maybe another `2` exists on the right.
+
+Template:
+
+```python
+def last_occurrence(nums, target):
+    left = 0
+    right = len(nums) - 1
+    answer = -1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if nums[mid] == target:
+            answer = mid
+            left = mid + 1
+
+        elif nums[mid] < target:
+            left = mid + 1
+
+        else:
+            right = mid - 1
+
+    return answer
+```
+
+### Memorize this:
+
+```text
+First occurrence → found → go LEFT
+
+Last occurrence  → found → go RIGHT
+```
+
+---
+
+# 9. Variation #3 — Lower Bound
+
+This is a very important binary-search concept.
+
+Suppose:
+
+```text
+nums = [1, 3, 5, 7, 9]
+target = 6
+```
+
+There is no `6`.
+
+We want:
+
+> First element that is **>= 6**
+
+That's `7`.
+
+```text
+[1, 3, 5, 7, 9]
+          ↑
+```
+
+This is called a **lower bound**.
+
+The condition we're searching for is:
+
+```text
+nums[mid] >= target
+```
+
+When true:
+
+```python
+answer = mid
+right = mid - 1
+```
+
+Because maybe there is an even earlier valid answer.
+
+---
+
+# 10. Variation #4 — Upper Bound
+
+Upper bound means:
+
+> First element that is **> target**
+
+Example:
+
+```text
+nums = [1, 3, 5, 5, 5, 7, 9]
+target = 5
+```
+
+First element greater than `5`:
+
+```text
+7
+```
+
+Again, binary search.
+
+---
+
+# 11. Binary Search on the Answer ⭐
+
+This is where Binary Search becomes really powerful.
+
+Suppose the question says:
+
+> Koko has piles of bananas. Find the minimum eating speed needed to finish within `h` hours.
+
+Possible speeds:
+
+```text
+1
+2
+3
+4
+5
+6
+...
+```
+
+We're not searching an array for the answer.
+
+We're searching:
+
+```text
+ANSWER SPACE
+```
+
+For each speed, ask:
+
+> Can Koko finish within `h` hours?
+
+The answers look like:
+
+```text
+Speed:    1  2  3  4  5  6  7  8
+Can?      ❌  ❌  ❌  ❌  ❌  ✅  ✅  ✅
+```
+
+Notice the pattern:
+
+```text
+False False False False False True True True
+                              ↑
+                         first True
+```
+
+This is **monotonic**.
+
+Once a speed works, every larger speed also works.
+
+Therefore:
+
+> **Binary Search!**
+
+This is called **Binary Search on Answer**.
+
+---
+
+# 12. The Big Mental Model
+
+There are basically two major forms you should learn:
+
+### Form 1 — Search in a sorted array
+
+```text
+[1, 3, 5, 7, 9, 11]
+ ↑              ↑
+left           right
+```
+
+Search for a value/index.
+
+---
+
+### Form 2 — Search for the optimal answer
+
+Example:
+
+```text
+Possible answers:
+
+1  2  3  4  5  6  7  8
+F  F  F  F  F  T  T  T
+               ↑
+          answer
+```
+
+Find:
+
+```text
+first True
+```
+
+or sometimes:
+
+```text
+last True
+```
+
+This pattern appears **a lot** in medium/hard LeetCode questions.
+
+---
+
+# 13. How to Identify Binary Search in Interviews
+
+When reading a problem, ask these questions **in order**:
+
+### Question 1
+
+**Is the data sorted?**
+
+If yes:
+
+> Binary Search?
+
+### Question 2
+
+**Can I eliminate half the search space after each comparison?**
+
+If yes:
+
+> Binary Search.
+
+### Question 3
+
+**Am I looking for minimum/maximum possible value?**
+
+If yes:
+
+> Can I check whether a candidate answer is valid?
+
+### Question 4
+
+Does the validity look like:
+
+```text
+FFFFTTTT
+```
+
+or:
+
+```text
+TTTTFFFF
+```
+
+If yes:
+
+> **Binary Search on Answer.**
+
+---
+
+# 14. Common Mistakes
+
+### ❌ Mistake 1
+
+Writing:
+
+```python
+mid = (left + right) / 2
+```
+
+In Python this produces a float.
+
+Use:
+
+```python
+mid = (left + right) // 2
+```
+
+---
+
+### ❌ Mistake 2
+
+Using:
+
+```python
+left = mid
+```
+
+or:
+
+```python
+right = mid
+```
+
+This can cause an infinite loop.
+
+Usually use:
+
+```python
+left = mid + 1
+right = mid - 1
+```
+
+---
+
+### ❌ Mistake 3
+
+Forgetting the array must have some exploitable ordering.
+
+Binary search isn't automatically applicable just because the input is an array.
+
+---
+
+### ❌ Mistake 4
+
+Stopping at the first match when the question asks:
+
+- first occurrence
+- last occurrence
+- minimum valid answer
+- maximum valid answer
+
+In these problems:
+
+> **Finding a valid answer isn't necessarily the same as finding the desired answer.**
+
+---
+
+# 15. LeetCode Practice Order
+
+Don't jump directly into hard problems.
+
+### 🟢 Level 1 — Basic Binary Search
+
+**704. Binary Search**
+
+[LeetCode 704 — Binary Search](https://leetcode.com/problems/binary-search/?utm_source=chatgpt.com)
+
+Learn:
+
+```text
+left
+right
+mid
+left = mid + 1
+right = mid - 1
+```
+
+---
+
+### 🟢 Level 2 — Search Insert Position
+
+**35. Search Insert Position**
+
+[LeetCode 35 — Search Insert Position](https://leetcode.com/problems/search-insert-position/?utm_source=chatgpt.com)
+
+Learn:
+
+> Where should the target go?
+
+---
+
+### 🟢 Level 3 — First/Last Position
+
+**34. Find First and Last Position of Element in Sorted Array**
+
+[LeetCode 34 — Find First and Last Position](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/?utm_source=chatgpt.com)
+
+Learn:
+
+```text
+first occurrence
+last occurrence
+```
+
+---
+
+### 🟡 Level 4 — Rotated Array
+
+**33. Search in Rotated Sorted Array**
+
+[LeetCode 33 — Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/?utm_source=chatgpt.com)
+
+Very important interview pattern.
+
+---
+
+### 🟡 Level 5 — Minimum in Rotated Array
+
+**153. Find Minimum in Rotated Sorted Array**
+
+[LeetCode 153 — Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/?utm_source=chatgpt.com)
+
+Learn how to determine which half is useful.
+
+---
+
+### 🟡 Level 6 — Peak
+
+**162. Find Peak Element**
+
+[LeetCode 162 — Find Peak Element](https://leetcode.com/problems/find-peak-element/?utm_source=chatgpt.com)
+
+Important because the array isn't necessarily sorted, but a **directional/monotonic property** allows binary search.
+
+---
+
+### 🟡 Level 7 — Binary Search on Answer
+
+**875. Koko Eating Bananas**
+
+[LeetCode 875 — Koko Eating Bananas](https://leetcode.com/problems/koko-eating-bananas/?utm_source=chatgpt.com)
+
+This is one of the most important problems for understanding:
+
+> **Binary Search on Answer**
+
+---
+
+### 🟡 Level 8 — Advanced Answer Search
+
+**1011. Capacity To Ship Packages Within D Days**
+
+[LeetCode 1011 — Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/?utm_source=chatgpt.com)
+
+This reinforces the exact same pattern:
+
+```text
+possible capacity
+        ↓
+Can I finish in D days?
+        ↓
+False False False True True True
+                    ↑
+                minimum
+```
+
+---
+
+# 🧠 Your Binary Search Cheat Sheet
+
+Keep this mental picture:
+
+```text
+                 BINARY SEARCH
+                       │
+          ┌────────────┴────────────┐
+          ↓                         ↓
+   Sorted Array              Search for Answer
+          │                         │
+          ↓                         ↓
+   Find target/index          Find min/max
+          │                    valid value
+          │                         │
+          ↓                         ↓
+   ┌───────────────┐          ┌─────────────┐
+   │ Normal Search │          │ Monotonic   │
+   │ First/Last    │          │ Condition   │
+   │ Rotated Array │          │ FFFFFTTTT   │
+   └───────────────┘          └─────────────┘
+```
+
+### The core template
+
+```python
+left = 0
+right = len(nums) - 1
+
+while left <= right:
+    mid = (left + right) // 2
+
+    if nums[mid] == target:
+        return mid
+
+    elif nums[mid] < target:
+        left = mid + 1
+
+    else:
+        right = mid - 1
+
+return -1
+```
+
+### The key question to remember
+
+> **"Can I throw away half of the possibilities?"**
+
+If yes, investigate Binary Search.
+
+---
+
+## What I recommend for you
+
+Since you've already covered **Hashing, Prefix Sum, Two Pointers, Sliding Window, Linked List, Stack, Queue, Recursion, and Binary Search**, don't just memorize these templates.
+
+For Binary Search, your next step should be to solve the **8 problems above in that order**. The most important progression is:
+
+```text
+704
+ ↓
+35
+ ↓
+34
+ ↓
+33
+ ↓
+153
+ ↓
+162
+ ↓
+875 ⭐
+ ↓
+1011 ⭐
+```
+
+After these, you should move into **Trees**, then **BST**, then **Graphs/BFS/DFS**.

@@ -17,6 +17,6 @@ class Solution:
             elif sqr < x:
                 left = mid+1
             else:
-                right = right-1
+                right = mid-1
         return right
             

@@ -1,0 +1,738 @@
+# Recursion — DSA
+
+Since you're learning DSA topic-by-topic, let's learn **Recursion from the interview/problem-solving perspective**, not just the definition.
+
+---
+
+## 1. What is Recursion?
+
+**Recursion = a function calling itself to solve a smaller version of the same problem.**
+
+Every recursive solution needs **two things**:
+
+### ① Base Case
+The condition that **stops** recursion.
+
+### ② Recursive Case
+The function calls itself with a **smaller/simpler input**.
+
+Example:
+
+```python
+def countdown(n):
+    if n == 0:          # Base case
+        return
+
+    print(n)
+    countdown(n - 1)    # Recursive case
+```
+
+Calling:
+
+```python
+countdown(5)
+```
+
+produces:
+
+```text
+5
+4
+3
+2
+1
+```
+
+---
+
+# 2. The Most Important Mental Model
+
+Don't think:
+
+> "The function is calling itself and I need to understand everything at once."
+
+Think:
+
+> **"Assume the smaller problem is already solved."**
+
+For example:
+
+```python
+def factorial(n):
+    if n == 1:
+        return 1
+
+    return n * factorial(n - 1)
+```
+
+For:
+
+```text
+factorial(5)
+```
+
+Think:
+
+```text
+5 * factorial(4)
+```
+
+Now **trust** that:
+
+```text
+factorial(4) = 24
+```
+
+Therefore:
+
+```text
+5 × 24 = 120
+```
+
+The complete expansion is:
+
+```text
+factorial(5)
+    ↓
+5 × factorial(4)
+        ↓
+    4 × factorial(3)
+            ↓
+        3 × factorial(2)
+                ↓
+            2 × factorial(1)
+                    ↓
+                    1
+```
+
+Then it returns upward:
+
+```text
+1
+↑
+2 × 1 = 2
+↑
+3 × 2 = 6
+↑
+4 × 6 = 24
+↑
+5 × 24 = 120
+```
+
+This **going down → hitting base case → coming back up** is fundamental to recursion.
+
+---
+
+# 3. Call Stack — VERY Important
+
+Recursion uses the **call stack**.
+
+Consider:
+
+```python
+def fun(n):
+    if n == 0:
+        return
+
+    print("Before", n)
+    fun(n - 1)
+    print("After", n)
+```
+
+Call:
+
+```python
+fun(3)
+```
+
+Output:
+
+```text
+Before 3
+Before 2
+Before 1
+After 1
+After 2
+After 3
+```
+
+Why?
+
+### Going DOWN
+
+```text
+fun(3)
+   ↓
+fun(2)
+   ↓
+fun(1)
+   ↓
+fun(0)
+```
+
+At `fun(0)`, recursion stops.
+
+### Coming BACK UP
+
+```text
+fun(1) → After 1
+fun(2) → After 2
+fun(3) → After 3
+```
+
+This is why recursion is extremely useful for **trees and graphs** later.
+
+---
+
+# 4. Recursion vs Iteration
+
+The same problem can usually be solved using a loop.
+
+### Iteration
+
+```python
+def factorial(n):
+    result = 1
+
+    for i in range(1, n + 1):
+        result *= i
+
+    return result
+```
+
+### Recursion
+
+```python
+def factorial(n):
+    if n == 1:
+        return 1
+
+    return n * factorial(n - 1)
+```
+
+### Difference
+
+| | Recursion | Iteration |
+|---|---|---|
+| Uses | Call stack | Loop |
+| Memory | Usually O(n) | Often O(1) |
+| Code | Sometimes cleaner | Often simpler |
+| Trees | ⭐⭐⭐⭐⭐ | More complicated |
+| Backtracking | ⭐⭐⭐⭐⭐ | More complicated |
+| Risk | Stack overflow | Usually safer |
+
+---
+
+# 5. How to Identify a Recursive Problem
+
+Ask yourself:
+
+### Question 1
+
+**Can I break the problem into a smaller version of itself?**
+
+For example:
+
+```text
+factorial(5)
+= 5 × factorial(4)
+```
+
+Yes → recursion may work.
+
+---
+
+### Question 2
+
+**Can I define a clear stopping condition?**
+
+For example:
+
+```python
+if n == 1:
+    return 1
+```
+
+Yes → good candidate.
+
+---
+
+### Question 3
+
+**Does each recursive call move toward the base case?**
+
+Good:
+
+```python
+fun(n - 1)
+```
+
+Bad:
+
+```python
+fun(n)
+```
+
+The bad version never reaches the base case.
+
+---
+
+# 6. Basic Recursion Patterns
+
+You should learn these in roughly this order.
+
+### Pattern 1 — Simple recursion
+
+```python
+def solve(n):
+    if n == 0:
+        return
+
+    solve(n - 1)
+```
+
+Used for understanding the call stack.
+
+---
+
+### Pattern 2 — Recursion with calculation
+
+```python
+def factorial(n):
+    if n == 1:
+        return 1
+
+    return n * factorial(n - 1)
+```
+
+---
+
+### Pattern 3 — Recursion over arrays/strings
+
+```python
+def sum_array(arr, i):
+    if i == len(arr):
+        return 0
+
+    return arr[i] + sum_array(arr, i + 1)
+```
+
+---
+
+### Pattern 4 — Multiple recursive calls
+
+Example Fibonacci:
+
+```python
+def fib(n):
+    if n <= 1:
+        return n
+
+    return fib(n - 1) + fib(n - 2)
+```
+
+Notice:
+
+```text
+             fib(5)
+            /      \
+        fib(4)     fib(3)
+        /   \       /   \
+    fib(3) fib(2) fib(2) fib(1)
+```
+
+This creates a **recursion tree**.
+
+---
+
+### Pattern 5 — Recursion + choice
+
+This is where recursion becomes extremely powerful.
+
+For example:
+
+```text
+Choose something
+    ↓
+Recursively solve
+    ↓
+Undo choice
+    ↓
+Try another choice
+```
+
+This is **Backtracking**.
+
+We'll learn this separately.
+
+---
+
+# 7. Recursion + Index
+
+A very common interview pattern is:
+
+```python
+def solve(arr, i):
+    if i == len(arr):
+        return
+
+    # process arr[i]
+
+    solve(arr, i + 1)
+```
+
+Example:
+
+```python
+def print_array(arr, i):
+    if i == len(arr):
+        return
+
+    print(arr[i])
+    print_array(arr, i + 1)
+```
+
+Calling:
+
+```python
+print_array([10, 20, 30, 40], 0)
+```
+
+gives:
+
+```text
+10
+20
+30
+40
+```
+
+You'll see this idea repeatedly in recursion problems.
+
+---
+
+# 8. A Very Important Trick: Before vs After Recursive Call
+
+Look carefully:
+
+### Before recursion
+
+```python
+def solve(n):
+    if n == 0:
+        return
+
+    print(n)
+    solve(n - 1)
+```
+
+Output:
+
+```text
+3
+2
+1
+```
+
+### After recursion
+
+```python
+def solve(n):
+    if n == 0:
+        return
+
+    solve(n - 1)
+    print(n)
+```
+
+Output:
+
+```text
+1
+2
+3
+```
+
+This is a **very important concept**.
+
+```text
+Before recursive call
+        ↓
+    GOING DOWN
+
+After recursive call
+        ↓
+    COMING UP
+```
+
+Once you understand this, many recursion questions become much easier.
+
+---
+
+# 9. Recursion Complexity
+
+Suppose:
+
+```python
+def fun(n):
+    if n == 0:
+        return
+
+    fun(n - 1)
+```
+
+There are `n` calls.
+
+Therefore:
+
+```text
+Time = O(n)
+Space = O(n)
+```
+
+Space is O(n) because of the call stack.
+
+---
+
+But Fibonacci:
+
+```python
+def fib(n):
+    if n <= 1:
+        return n
+
+    return fib(n-1) + fib(n-2)
+```
+
+creates many overlapping calls.
+
+Approximately:
+
+```text
+Time = O(2^n)
+Space = O(n)
+```
+
+Later you'll learn **Dynamic Programming** to fix this.
+
+---
+
+# 10. The Recursion Template
+
+When solving a recursion problem, start with this:
+
+```python
+def solve(problem):
+    
+    # 1. Base case
+    if ...:
+        return ...
+
+    # 2. Do something
+
+    # 3. Smaller problem
+    return solve(smaller_problem)
+```
+
+For multiple branches:
+
+```python
+def solve(problem):
+    
+    if base_case:
+        return ...
+
+    answer1 = solve(choice1)
+    answer2 = solve(choice2)
+
+    return combine(answer1, answer2)
+```
+
+---
+
+# 11. How You Should Solve Recursion Problems
+
+Use this checklist:
+
+```text
+1. What is the smallest possible input?
+           ↓
+2. That's probably my BASE CASE.
+           ↓
+3. What is the smaller version of the problem?
+           ↓
+4. Make the recursive call on that smaller problem.
+           ↓
+5. How do I use its answer to solve the current problem?
+```
+
+The **#4 → #5** part is where most beginners struggle.
+
+The key is:
+
+> **Trust the recursive call.**
+
+If you're writing:
+
+```python
+return n * factorial(n - 1)
+```
+
+you don't need to manually calculate `factorial(n - 1)`.
+
+Just assume:
+
+```text
+factorial(n - 1)
+```
+
+returns the correct answer.
+
+---
+
+# 12. Your Recursion Learning Path
+
+I recommend this order:
+
+```text
+Recursion Basics
+      ↓
+Call Stack
+      ↓
+Simple Recursion
+      ↓
+Recursion with Arrays/Strings
+      ↓
+Multiple Recursion
+      ↓
+Recursion Trees
+      ↓
+Backtracking
+      ↓
+Tree DFS
+      ↓
+Graph DFS
+      ↓
+Dynamic Programming
+```
+
+And importantly, **you don't need to study Trees or Graphs before learning recursion**.
+
+In fact, learning recursion **now** is a good idea because it will make your upcoming Tree/Graph topics much easier.
+
+---
+
+## Practice progression
+
+Start with these types of problems:
+
+1. Print numbers `1 → N`
+2. Print numbers `N → 1`
+3. Sum of `1 → N`
+4. Factorial
+5. Power of a number
+6. Reverse a string
+7. Check palindrome
+8. Fibonacci
+9. Recursive binary search
+10. Generate subsequences → **then Backtracking**
+
+Don't jump directly into hard recursion problems. First become comfortable with **base case + smaller problem + return value + call stack**.
+
+### One thing I want you to master first
+
+Given:
+
+```python
+def fun(n):
+    if n == 0:
+        return
+
+    print(n)
+    fun(n - 1)
+    print(n)
+```
+
+For:
+
+```python
+fun(3)
+```
+
+**What do you think the output will be?**
+
+Try it yourself before I explain the next recursion concept.
+
+### 🟢 Level 1 — Recursion fundamentals
+
+1. **[Fibonacci Number — LeetCode 509](https://leetcode.com/problems/fibonacci-number/)**  
+   Practice: base case + multiple recursive calls.
+
+2. **[Power of Two — LeetCode 231](https://leetcode.com/problems/power-of-two/)**  
+   Practice: reducing the problem recursively.
+
+3. **[Pow(x, n) — LeetCode 50](https://leetcode.com/problems/powx-n/)** ⭐  
+   Important recursion + divide-and-conquer.  
+   **Target:** understand why the optimized solution is `O(log n)`.
+
+---
+
+### 🟡 Level 2 — Recursion on arrays/strings
+
+4. **[Reverse String — LeetCode 344](https://leetcode.com/problems/reverse-string/)**  
+   Practice: recursion with two pointers.
+
+5. **[Palindrome Number — LeetCode 9](https://leetcode.com/problems/palindrome-number/)**  
+   Try to think recursively about comparing outer elements.
+
+6. **[Reverse Linked List — LeetCode 206](https://leetcode.com/problems/reverse-linked-list/)** ⭐  
+   Excellent recursion problem. Since you've already studied Linked Lists, definitely do this.
+
+---
+
+### 🟠 Level 3 — Recursive search
+
+7. **[Binary Search — LeetCode 704](https://leetcode.com/problems/binary-search/)** ⭐  
+   Implement binary search **recursively**, even though an iterative solution is common.
+
+8. **[Search in a Binary Search Tree — LeetCode 700](https://leetcode.com/problems/search-in-a-binary-search-tree/)**  
+   This is your first taste of why recursion is so natural for trees.
+
+---
+
+### 🔴 Level 4 — Recursion → Backtracking
+
+Once the above feels comfortable:
+
+9. **[Subsets — LeetCode 78](https://leetcode.com/problems/subsets/)** ⭐⭐⭐  
+   One of the **most important recursion/backtracking problems**.
+
+10. **[Permutations — LeetCode 46](https://leetcode.com/problems/permutations/)** ⭐⭐⭐  
+    Learn recursion with choices.
+
+11. **[Combination Sum — LeetCode 39](https://leetcode.com/problems/combination-sum/)** ⭐⭐⭐  
+    Recursion + decision tree.
+
+12. **[Letter Combinations of a Phone Number — LeetCode 17](https://leetcode.com/problems/letter-combinations-of-a-phone-number/)** ⭐⭐⭐  
+    Excellent for understanding multiple choices at each recursive level.
+
+---
+
+## 🎯 For you, I recommend this exact sequence
+
+Don't try all 12 immediately:
+
+```text
+509  → Fibonacci
+231  → Power of Two
+50   → Pow(x,n)
+344  → Reverse String
+206  → Reverse Linked List
+704  → Recursive Binary Search
+        ↓
+       78   → Subsets
+       46   → Permutations
+       39   → Combination Sum
+```
+
+**Do 509 → 231 → 50 first.** After you solve those, send me your code/approach and I'll review it before you move to the next level.

@@ -1,0 +1,358 @@
+Now Queue
+Queue — DSA
+Since you’ve already done Stack, Queue is the natural next topic. The key idea is very simple:
+
+Stack = LIFO → Last In, First Out
+Queue = FIFO → First In, First Out
+
+1. What is a Queue?
+A Queue is a linear data structure where:
+
+insertion happens from the rear
+deletion happens from the front
+Think of a line at a ticket counter:
+
+        FRONT                    REAR
+          ↓                        ↓
+       [10] [20] [30] [40]
+        ↑                         ↑
+     remove                     insert
+If we insert 50:
+
+[10] [20] [30] [40] [50]
+If we remove:
+
+[20] [30] [40] [50]
+ ↑
+front
+So 10 leaves first because it entered first.
+
+2. Basic Operations
+Enqueue → Insert
+enqueue(50)
+
+[10] [20] [30] [40] [50]
+                         ↑
+                        rear
+Dequeue → Remove
+dequeue()
+
+[20] [30] [40] [50]
+ ↑
+front
+Peek / Front
+Look at the first element without removing it.
+
+[20] [30] [40] [50]
+ ↑
+peek = 20
+isEmpty
+Checks whether queue contains anything.
+
+[]
+→ True
+
+3. Queue vs Stack
+Stack	Queue
+Rule	LIFO	FIFO
+Insert	Top	Rear
+Remove	Top	Front
+Example	Stack of plates	People standing in line
+Insert operation	push()	enqueue()
+Remove operation	pop()	dequeue()
+Easy memory trick
+STACK
+Last person enters → First person leaves
+
+QUEUE
+First person enters → First person leaves
+4. Queue in Python
+Python's deque is commonly used:
+
+from collections import deque
+
+q = deque()
+
+q.append(10)    # enqueue
+q.append(20)
+q.append(30)
+
+print(q)
+
+Output:
+
+deque([10, 20, 30])
+Remove from front:
+
+q.popleft()
+
+So:
+
+from collections import deque
+
+q = deque()
+
+q.append(10)
+q.append(20)
+q.append(30)
+
+print(q.popleft())   # 10
+print(q)
+
+Output:
+
+10
+deque([20, 30])
+5. Important: Why not normal Python List?
+You can do:
+
+q = [10, 20, 30]
+
+q.pop(0)
+
+But pop(0) is O(n) because all remaining elements have to shift.
+
+Before:
+
+[10] [20] [30] [40]
+
+remove 10
+
+[20] [30] [40]
+The elements need to be shifted.
+
+With deque:
+
+q.popleft()
+
+→ O(1)
+
+So for DSA problems, prefer:
+
+from collections import deque
+
+6. Types / Variations of Queue
+You should know these:
+
+① Simple Queue
+Normal FIFO.
+
+10 → 20 → 30 → 40
+↑               ↑
+front          rear
+② Circular Queue
+The rear can wrap around to the beginning.
+
+       ┌───────────────┐
+       ↓               │
+[10] [20] [30] [40] [50]
+ ↑                     │
+ └─────────────────────┘
+Useful when you want to reuse empty spaces.
+
+③ Deque
+Double Ended Queue
+
+You can insert/remove from both ends.
+
+       insert/remove
+          ↓
+       [10] [20] [30]
+          ↑
+       insert/remove
+Python:
+
+from collections import deque
+
+dq = deque()
+
+dq.append(10)       # right
+dq.appendleft(20)   # left
+
+dq.pop()            # remove right
+dq.popleft()        # remove left
+
+④ Priority Queue
+Elements are removed according to priority, not simply insertion order.
+
+Example:
+
+Patient A → priority 3
+Patient B → priority 1
+Patient C → priority 2
+Removal order:
+
+B → C → A
+In Python, commonly:
+
+import heapq
+
+pq = []
+
+heapq.heappush(pq, 3)
+heapq.heappush(pq, 1)
+heapq.heappush(pq, 2)
+
+print(heapq.heappop(pq))  # 1
+
+This connects directly to the Heap / Priority Queue pattern later.
+
+7. The Most Important Queue Pattern: BFS
+This is where Queue becomes very important for LeetCode.
+
+Whenever you see:
+
+level by level
+
+think:
+
+BFS → Queue
+
+Example tree:
+
+          1
+        /   \
+       2     3
+      / \   / \
+     4   5 6   7
+BFS traversal:
+
+1
+2 3
+4 5 6 7
+We use a queue:
+
+Queue
+
+[1]
+
+remove 1
+add 2, 3
+
+[2, 3]
+
+remove 2
+add 4, 5
+
+[3, 4, 5]
+
+remove 3
+add 6, 7
+
+[4, 5, 6, 7]
+This is the fundamental idea behind level-order traversal.
+
+8. How to Identify Queue Problems
+When reading a problem, ask:
+
+Checklist
+1. Does something need to be processed in the order it arrived?
+
+→ Queue
+
+2. Is it asking for level-by-level processing?
+
+→ Queue + BFS
+
+3. Is it a shortest path in an unweighted graph?
+
+→ Usually Queue + BFS
+
+4. Do we need to process neighboring nodes?
+
+→ Often Queue + BFS
+
+5. Is there a waiting-line / scheduling concept?
+
+→ Queue
+
+6. Do we need FIFO behavior?
+
+→ Queue
+
+9. Queue Complexity
+For a proper queue implementation:
+
+Operation	Complexity
+Enqueue	O(1)
+Dequeue	O(1)
+Peek	O(1)
+isEmpty	O(1)
+Search	O(n)
+For Python:
+
+q.append(x)      # O(1)
+q.popleft()      # O(1)
+q[0]             # O(1)
+
+10. Queue vs BFS
+This distinction is important:
+
+Queue is a data structure.
+
+BFS is an algorithm that often uses a queue.
+
+Think:
+
+Queue
+  ↓
+tool/data structure
+
+BFS
+  ↓
+algorithm
+  ↓
+uses Queue
+Similar to:
+
+Stack → can be used by DFS
+Queue → can be used by BFS
+11. LeetCode Problems to Practice
+Start in this order:
+
+Easy
+232. Implement Queue using Stacks
+https://leetcode.com/problems/implement-queue-using-stacks/
+
+225. Implement Stack using Queues
+https://leetcode.com/problems/implement-stack-using-queues/
+
+933. Number of Recent Calls
+https://leetcode.com/problems/number-of-recent-calls/
+
+346. Moving Average from Data Stream
+https://leetcode.com/problems/moving-average-from-data-stream/
+
+BFS + Queue
+102. Binary Tree Level Order Traversal ⭐
+https://leetcode.com/problems/binary-tree-level-order-traversal/
+
+994. Rotting Oranges ⭐
+https://leetcode.com/problems/rotting-oranges/
+
+733. Flood Fill
+https://leetcode.com/problems/flood-fill/
+
+542. 01 Matrix ⭐
+https://leetcode.com/problems/01-matrix/
+
+🧠 The main thing I want you to remember
+Don't try to memorize dozens of Queue problems.
+
+Remember this:
+
+                    QUEUE
+                      |
+          +-----------+-----------+
+          |                       |
+        FIFO                    BFS
+          |                       |
+   arrival/order based      level-by-level
+                                  |
+                         shortest path
+                         unweighted graph
+                         tree levels
+                         grid spreading
+And the first Queue pattern you should master is BFS.
+
+Next, we should learn BFS properly — including the exact mental process for recognizing BFS, the deque template, tree BFS, grid BFS, and shortest-path BFS.

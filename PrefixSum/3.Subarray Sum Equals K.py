@@ -17,3 +17,5 @@ class Solution:
             prefix[current_sum] = prefix.get(current_sum, 0) + 1
 
         return count
+
+        #Revision - 28/09/2026
